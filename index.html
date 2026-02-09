@@ -16,10 +16,7 @@
   <meta property="og:title" content="האלף-בית של אבי">
   <meta property="og:description" content="Avi Teaches the Hebrew Alphabet">
   <meta property="og:image" content="https://rjarosh.github.io/alefbet/og_image.png">
-
-
   <style>
-
     @font-face {
     font-family: 'RobertsHebrew-Regular';
     src: url('RobertsHebrew-Regular.ttf') format('truetype');
@@ -56,36 +53,146 @@
     button:hover {
       background: darkgreen;
     }
+
+    /* Popup Styles */
+    .popup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      animation: fadeIn 0.3s forwards;
+    }
+
+    .popup-overlay.hidden {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .popup-box {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      transform: scale(0.9);
+      animation: scaleIn 0.3s forwards;
+    }
+
+    @keyframes scaleIn {
+      to {
+        transform: scale(1);
+      }
+    }
+
+    .popup-title {
+      font-size: 2em;
+      color: #55b562;
+      margin-bottom: 30px;
+      font-weight: 700;
+    }
+
+    .popup-instructions {
+      font-size: 1.1em;
+      color: #333;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    .popup-instruction-item {
+      margin-bottom: 15px;
+    }
+
+    .popup-instruction-item:last-child {
+      margin-bottom: 25px;
+    }
+
+    .icon {
+      display: inline-block;
+      margin-right: 8px;
+      font-size: 1.2em;
+    }
+
+    .tap-hint {
+      color: #999;
+      font-size: 0.9em;
+      margin-top: 20px;
+      font-style: italic;
+    }
   </style>
 </head>
 <body>
+  <!-- Popup -->
+  <div class="popup-overlay" id="welcomePopup">
+    <div class="popup-box">
+      <h1 class="popup-title">האלף-בית של אבי</h1>
+      <h1 class="popup-title">Avi's Alef Bet</h1>
+      <div class="popup-instructions">
+        <div class="popup-instruction-item">
+          <span class="icon">🔊</span>
+          Tap the letter or press the space bar to listen
+        </div>
+        <div class="popup-instruction-item">
+          <span class="icon">⬅️</span>
+          Tap the arrow button or left arrow on your keyboard to continue
+        </div>
+      </div>
+      <p class="tap-hint">Tap to continue</p>
+    </div>
+  </div>
+
   <div id="letter"></div>
   <div id="buttons">
   <!-- <button id="playBtn">🔊</button> -->
   <button id="nextBtn">⬅️</button>
 </div>
   <script>
+    // Popup Logic
+    const hasVisited = localStorage.getItem('avisAlefBetVisited');
+    const popup = document.getElementById('welcomePopup');
+
+    if (!hasVisited) {
+      popup.classList.remove('hidden');
+      popup.addEventListener('click', function() {
+        popup.classList.add('hidden');
+        localStorage.setItem('avisAlefBetVisited', 'true');
+      });
+    } else {
+      popup.classList.add('hidden');
+    }
+
+    // Original App Logic
     const letters = ['א','ב','ג','ד','ה','ו','ז','ח','ט','י','כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת']
     const letterDiv = document.getElementById("letter");
     // const playBtn = document.getElementById("playBtn");
     const nextBtn = document.getElementById("nextBtn");
-
     let currentLetter = null;
     let audio = null;
-
     // pick a random letter
     function getRandomLetter() {
       const randomIndex = Math.floor(Math.random() * letters.length);
       return letters[randomIndex];
     }
-
     // load a letter + its audio
     function loadLetter() {
       currentLetter = getRandomLetter();
       letterDiv.textContent = currentLetter;
       audio = new Audio(`audio/${currentLetter}.m4a`);
     }
-
     // play current letter sound
     function playSound() {
       if (audio) {
@@ -93,23 +200,19 @@
         audio.play();
       }
     }
-
     // events
     // playBtn.addEventListener("click", playSound);
     nextBtn.addEventListener("click", loadLetter);
     letterDiv.addEventListener("click",playSound);
-
     document.addEventListener('keydown',function(event) {
       if (event.code === 'Space') {
-        event.preventDefault;
+        event.preventDefault();
         playSound();
       } else if (event.code === 'ArrowLeft') {
         loadLetter();
       }
     }
-
       )
-
     // initialize first letter on page load
     window.onload = loadLetter;
   </script>
